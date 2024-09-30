@@ -22,6 +22,7 @@ def driver(request):
 
     browser.quit()
 
+
 @pytest.fixture()
 def create_user():
     created_user = StarburgerApi.user_registration(Helper.create_fake_registration_body())

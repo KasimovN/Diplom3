@@ -27,7 +27,6 @@ class TestRecoveryPassword:
         recovery_visible_button.click_element(LoginPageLocators.RECOVERY_PASSWORD_BUTTON)
         recovery_visible_button.filling_text_field(RecoveryPageLocators.EMAIL_TEXT_FIELD, email)
         recovery_visible_button.click_element(RecoveryPageLocators.RECOVERY_BUTTON)
-        # recovery_visible_button.filling_text_field(RecoveryPageLocators.PASSWORD_TEXT_FIELD, '1234567890')
         recovery_visible_button.wait_and_find_element(RecoveryPageLocators.VISIBLE_PASSWORD_BUTTON).click()
         password_field = recovery_visible_button.wait_and_find_element(RecoveryPageLocators.PASSWORD_TEXT_FIELD)
         assert password_field.get_attribute('type') == 'text'

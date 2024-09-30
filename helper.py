@@ -9,7 +9,6 @@ class Helper:
         body = ApiData.BODY_USER_REGISTRATION.copy()
         fake = Faker()
         body['email'] = fake.email()
-        body['password'] = fake.password()
         body['name'] = fake.name()
 
         return body
