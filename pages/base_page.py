@@ -14,6 +14,10 @@ class BasePage:
         clicked_element = self.wait_and_find_element(locator_click)
         clicked_element.click()
 
+    def filling_text_field(self, filling_locator, filling_text):
+        filled_element = self.wait_and_find_element(filling_locator)
+        filled_element.send_keys(filling_text)
+
     # @staticmethod
     # def scroll_page_to_footer(driver):
     #     driver.execute_script("window.scrollTo(0, document.body.scrollHeight)")
