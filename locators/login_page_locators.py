@@ -10,3 +10,4 @@ class LoginPageLocators:
     ORDER_HISTORY_BUTTON = (By.XPATH, '//a[text()="История заказов"]')
     DATE_ORDER = (By.XPATH, '//p[contains(text(),"Сегодня")]')
     LOGOUT_BUTTON = (By.XPATH, '//button[text()="Выход"]')
+    CONSTRUCTOR_BUTTON = (By.XPATH, '//button[text()="Выход"]')
