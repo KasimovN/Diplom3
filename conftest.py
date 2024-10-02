@@ -25,7 +25,7 @@ def driver(request):
 
 @pytest.fixture()
 def create_user():
-    created_user = StarburgerApi.user_registration(Helper.create_fake_registration_body())
+    created_user = StarburgerApi.user_registration(Helper.create_random_registration_body())
     token = created_user.json()['accessToken']
 
     yield created_user

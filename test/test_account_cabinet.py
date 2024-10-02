@@ -1,3 +1,5 @@
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
 from api_data import ApiData
@@ -12,13 +14,13 @@ class TestAccountCabinet:
         email = create_user.json()['user']['email']
         account_cabinet = RecoveryPage(driver)
         account_cabinet.click_element(MainPageLocators.ACCOUNT_BUTTON)
-        account_cabinet.click_element(LoginPageLocators.EMAIL_TEXT_FIELD)  # Костыль
         account_cabinet.filling_text_field(LoginPageLocators.EMAIL_TEXT_FIELD, email)
         account_cabinet.filling_text_field(LoginPageLocators.PASSWORD_TEXT_FIELD,
                                            ApiData.BODY_USER_REGISTRATION['password'])
         account_cabinet.click_element(LoginPageLocators.ENTER_BUTTON)
-        account_cabinet.wait_and_find_element(MainPageLocators.ACCOUNT_BUTTON) # Костыль
-        account_cabinet.click_element(MainPageLocators.LOGO_BUTTON)  # Костыль
+        modal = (By.XPATH, "//div[contains(@class, 'Modal_modal_overlay__x2ZCr')]/parent::div")
+        WebDriverWait(driver, 10).until_not(expected_conditions.visibility_of_element_located(modal))
+        account_cabinet.wait_and_find_element(MainPageLocators.KRATERNAY_BULKA)
         account_cabinet.click_element(MainPageLocators.ACCOUNT_BUTTON)
         login = account_cabinet.wait_and_find_element(LoginPageLocators.LOGIN_TEXT)
         assert login.get_attribute('value') == email
@@ -34,9 +36,10 @@ class TestAccountCabinet:
         account_cabinet.filling_text_field(LoginPageLocators.PASSWORD_TEXT_FIELD,
                                            ApiData.BODY_USER_REGISTRATION['password'])
         account_cabinet.click_element(LoginPageLocators.ENTER_BUTTON)
-        account_cabinet.wait_and_find_element(MainPageLocators.ACCOUNT_BUTTON) # Костыль
-        account_cabinet.click_element(MainPageLocators.LOGO_BUTTON)  # Костыль
+        modal = (By.XPATH, "//div[contains(@class, 'Modal_modal_overlay__x2ZCr')]/parent::div")
+        WebDriverWait(driver, 10).until_not(expected_conditions.visibility_of_element_located(modal))
         account_cabinet.click_element(MainPageLocators.ACCOUNT_BUTTON)
+        WebDriverWait(driver, 10).until_not(expected_conditions.visibility_of_element_located(modal))
         account_cabinet.click_element(LoginPageLocators.ORDER_HISTORY_BUTTON)
         assert 'Сегодня' in account_cabinet.wait_and_find_element(LoginPageLocators.DATE_ORDER).text
 
@@ -49,8 +52,10 @@ class TestAccountCabinet:
         account_cabinet.filling_text_field(LoginPageLocators.PASSWORD_TEXT_FIELD,
                                            ApiData.BODY_USER_REGISTRATION['password'])
         account_cabinet.click_element(LoginPageLocators.ENTER_BUTTON)
-        account_cabinet.wait_and_find_element(MainPageLocators.ACCOUNT_BUTTON) # Костыль
-        account_cabinet.click_element(MainPageLocators.LOGO_BUTTON)  # Костыль
+        modal = (By.XPATH, "//div[contains(@class, 'Modal_modal_overlay__x2ZCr')]/parent::div")
+        WebDriverWait(driver, 10).until_not(expected_conditions.visibility_of_element_located(modal))
         account_cabinet.click_element(MainPageLocators.ACCOUNT_BUTTON)
         account_cabinet.click_element(LoginPageLocators.LOGOUT_BUTTON)
+        WebDriverWait(driver, 10).until_not(expected_conditions.visibility_of_element_located(modal))
+        account_cabinet.click_element(LoginPageLocators.ENTER_BUTTON)
         assert account_cabinet.wait_and_find_element(LoginPageLocators.ENTER_BUTTON)
