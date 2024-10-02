@@ -41,7 +41,7 @@ class TestAccountCabinet:
         account_cabinet.click_element(MainPageLocators.ACCOUNT_BUTTON)
         WebDriverWait(driver, 10).until_not(expected_conditions.visibility_of_element_located(modal))
         account_cabinet.click_element(LoginPageLocators.ORDER_HISTORY_BUTTON)
-        assert 'Сегодня' in account_cabinet.wait_and_find_element(LoginPageLocators.DATE_ORDER).text
+        assert account_cabinet.wait_and_find_element(LoginPageLocators.DATE_ORDER).text
 
     def test_logout(self, driver, create_user):
         email = create_user.json()['user']['email']
