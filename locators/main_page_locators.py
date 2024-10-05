@@ -17,3 +17,4 @@ class MainPageLocators:
     ORDER_IDENTIFICATION = (By.XPATH, '//p[text()="идентификатор заказа"]')
     ORDER_CLOSE_BUTTON = (By.XPATH, '//button[contains(@class, "Modal_modal__close")]')
     TIK_ANIMATION = (By.XPATH, '//img[@alt="tick animation"]')
+    MODAL = (By.XPATH, "//div[contains(@class, 'Modal_modal_overlay__x2ZCr')]/parent::div")

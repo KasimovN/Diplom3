@@ -1,7 +1,8 @@
 import time
-from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
+
+from locators.main_page_locators import MainPageLocators
 
 
 class BasePage:
@@ -21,10 +22,6 @@ class BasePage:
         filled_element = self.wait_and_find_element(filling_locator)
         filled_element.send_keys(filling_text)
 
-    # @staticmethod
-    # def scroll_page_to_footer(driver):
-    #     driver.execute_script("window.scrollTo(0, document.body.scrollHeight)")
-    #
-    # def click_cookie_button(self):
-    #     cokkie_button = self.wait_and_find_element(MainPageLocators.COOKIE_BUTTON)
-    #     cokkie_button.click()
+    def wait_close_modal_page(self):
+        WebDriverWait(self.driver, 10).until_not(expected_conditions.
+                                                 visibility_of_element_located(MainPageLocators.MODAL))
