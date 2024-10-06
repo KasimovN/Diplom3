@@ -1,54 +1,47 @@
 from api_data import ApiData
-from locators.login_page_locators import LoginPageLocators
-from locators.main_page_locators import MainPageLocators
-from pages.recovery_page import RecoveryPage
+from pages.login_page import LoginPage
+from pages.order_list import OrderListPage
 from starburger_api import StarburgerApi
 
 
 class TestAccountCabinet:
     def test_account_cabinet_button_pass(self, driver, create_user):
-        email = create_user.json()['user']['email']  # Создаем временного пользователя
-        account_cabinet = RecoveryPage(driver)
-        account_cabinet.click_element(MainPageLocators.ACCOUNT_BUTTON)  # Переходим на странциу "Личный кабинет"
-        account_cabinet.filling_text_field(LoginPageLocators.EMAIL_TEXT_FIELD, email)
-        account_cabinet.filling_text_field(LoginPageLocators.PASSWORD_TEXT_FIELD,
-                                           ApiData.BODY_USER_REGISTRATION['password'])
-        account_cabinet.click_element(LoginPageLocators.ENTER_BUTTON)  # Авторизовываемся
+        email = create_user.json()['user']['email']
+        account_cabinet = LoginPage(driver)
+        account_cabinet.main_page_click_to_login()
+        account_cabinet.login_page_fill_email(email)
+        account_cabinet.login_page_fill_password(ApiData.BODY_USER_REGISTRATION['password'])
+        account_cabinet.login_page_log_in()
         account_cabinet.wait_close_modal_page()
-        account_cabinet.wait_and_find_element(MainPageLocators.KRATERNAY_BULKA)  # Ожидаем прогрузки страницы
-        account_cabinet.click_element(MainPageLocators.ACCOUNT_BUTTON)  # Переходим в личный кабинет
-        login = account_cabinet.wait_and_find_element(LoginPageLocators.LOGIN_TEXT)
+        account_cabinet.main_page_wait_and_find_kraternaya_bulka()
+        account_cabinet.main_page_click_to_login()
+        login = account_cabinet.login_page_login_text()
         assert login.get_attribute('value') == email
 
     def test_order_history(self, driver, create_user):
-        email = create_user.json()['user']['email']  # Создаем временного пользователя
-        token = create_user.json()['accessToken']  # Запоминаем токен временного пользователя
-        order_response = StarburgerApi.create_order(token, ApiData.DODY_CREATE_ORDER)  # Создаем заказ через API
-        account_cabinet = RecoveryPage(driver)
-        account_cabinet.click_element(MainPageLocators.ACCOUNT_BUTTON)
-        account_cabinet.click_element(LoginPageLocators.EMAIL_TEXT_FIELD)
-        account_cabinet.filling_text_field(LoginPageLocators.EMAIL_TEXT_FIELD, email)
-        account_cabinet.filling_text_field(LoginPageLocators.PASSWORD_TEXT_FIELD,
-                                           ApiData.BODY_USER_REGISTRATION['password'])
-        account_cabinet.click_element(LoginPageLocators.ENTER_BUTTON)  # Авторизовываемся
-        account_cabinet.wait_close_modal_page()
-        account_cabinet.click_element(MainPageLocators.ACCOUNT_BUTTON)
-        account_cabinet.wait_close_modal_page()
-        account_cabinet.click_element(LoginPageLocators.ORDER_HISTORY_BUTTON)  # Заходим в историю заказов
-        assert account_cabinet.wait_and_find_element(LoginPageLocators.DATE_ORDER).text
+        email = create_user.json()['user']['email']
+        token = create_user.json()['accessToken']
+        order_response = StarburgerApi.create_order(token, ApiData.DODY_CREATE_ORDER)
+        order_history = OrderListPage(driver)
+        order_history.main_page_click_to_login()
+        order_history.login_page_fill_email(email)
+        order_history.login_page_fill_password(ApiData.BODY_USER_REGISTRATION['password'])
+        order_history.login_page_log_in()
+        order_history.wait_close_modal_page()
+        order_history.main_page_click_to_login()
+        order_history.wait_close_modal_page()
+        order_history.login_page_click_order_history()
+        assert order_history.order_list_date_new_order().text
 
     def test_logout(self, driver, create_user):
-        email = create_user.json()['user']['email']  # Создаем временного пользователя
-        account_cabinet = RecoveryPage(driver)
-        account_cabinet.click_element(MainPageLocators.ACCOUNT_BUTTON)
-        account_cabinet.click_element(LoginPageLocators.EMAIL_TEXT_FIELD)
-        account_cabinet.filling_text_field(LoginPageLocators.EMAIL_TEXT_FIELD, email)
-        account_cabinet.filling_text_field(LoginPageLocators.PASSWORD_TEXT_FIELD,
-                                           ApiData.BODY_USER_REGISTRATION['password'])
-        account_cabinet.click_element(LoginPageLocators.ENTER_BUTTON)  # Авторизовываемся
-        account_cabinet.wait_close_modal_page()
-        account_cabinet.click_element(MainPageLocators.ACCOUNT_BUTTON)
-        account_cabinet.click_element(LoginPageLocators.LOGOUT_BUTTON)
-        account_cabinet.wait_close_modal_page()
-        account_cabinet.click_element(LoginPageLocators.ENTER_BUTTON)  # Выход из личного кабинета
-        assert account_cabinet.wait_and_find_element(LoginPageLocators.ENTER_BUTTON)
+        email = create_user.json()['user']['email']
+        logout = LoginPage(driver)
+        logout.main_page_click_to_login()
+        logout.login_page_fill_email(email)
+        logout.login_page_fill_password(ApiData.BODY_USER_REGISTRATION['password'])
+        logout.login_page_log_in()
+        logout.wait_close_modal_page()
+        logout.main_page_click_to_login()
+        logout.login_page_click_logout()
+        logout.wait_close_modal_page()
+        assert logout.login_page_title()

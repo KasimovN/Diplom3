@@ -1,101 +1,93 @@
 import time
 from selenium.webdriver.common.by import By
 from seletools.actions import drag_and_drop
-
 from api_data import ApiData
-from locators.login_page_locators import LoginPageLocators
 from locators.main_page_locators import MainPageLocators
-from locators.order_list_locators import OrderListLocators
-from pages.main_page import MainPage
+from pages.order_list import OrderListPage
 
 
 class TestOrderList:
     def test_full_order_information(self, driver):
-        order_list = MainPage(driver)
-        order_list.click_element(MainPageLocators.ORDER_LIST)  # Открываем "Лента заказов"
-        order_list.click_element(OrderListLocators.FIRST_ORDER_FROM_LIST)
-        assert order_list.wait_and_find_element(OrderListLocators.CONTAINS)
+        order_list = OrderListPage(driver)
+        order_list.main_page_click_order_list()
+        order_list.order_list_page_click_first_order()
+        assert order_list.order_list_page_order_contains()
 
     def test_order_history_in_order_list(self, create_user, driver):
-        email = create_user.json()['user']['email']  # Создаем временного пользователя
-        create_order = MainPage(driver)
-        create_order.click_element(MainPageLocators.ACCOUNT_BUTTON)
-        create_order.filling_text_field(LoginPageLocators.EMAIL_TEXT_FIELD, email)
-        create_order.filling_text_field(LoginPageLocators.PASSWORD_TEXT_FIELD,
-                                        ApiData.BODY_USER_REGISTRATION['password'])
-        create_order.click_element(LoginPageLocators.ENTER_BUTTON)  # Авторизовываемся
+        email = create_user.json()['user']['email']
+        create_order = OrderListPage(driver)
+        create_order.main_page_click_to_login()
+        create_order.login_page_fill_email(email)
+        create_order.login_page_fill_password(ApiData.BODY_USER_REGISTRATION['password'])
+        create_order.login_page_log_in()
         create_order.wait_close_modal_page()
-        element_from = create_order.wait_and_find_element(MainPageLocators.KRATERNAY_BULKA)
-        element_to = create_order.wait_and_find_element(MainPageLocators.TOP_BASKET_CONSTRUCTOR)
+        element_from = create_order.main_page_wait_and_find_kraternaya_bulka()
+        element_to = create_order.main_page_wait_and_find_basket()
         drag_and_drop(driver, element_from, element_to)
-        create_order.click_element(MainPageLocators.ORDER)  # Создаем заказ
+        create_order.main_page_click_order_button()
         time.sleep(3)  # Костыль - для стальной отработки
-        number = create_order.wait_and_find_element(MainPageLocators.ORDER_NUMBER).text  # Запоминаем номер заказа
-        create_order.click_element(MainPageLocators.ORDER_CLOSE_BUTTON)
-        create_order.click_element(MainPageLocators.ORDER_LIST)
+        number = create_order.main_page_wait_and_find_order_number().text
+        create_order.main_page_click_close_order_modal()
+        create_order.main_page_click_order_list()
         time.sleep(3)  # Костыль - для стальной отработки
         locator = f'//*[contains(text(),"{number}")]'
-        assert create_order.wait_and_find_element((By.XPATH, locator))  # Проверяем, что новый заказ есть в ленте
+        assert create_order.wait_and_find_element((By.XPATH, locator))
 
     def test_ready_counter_all_time(self, create_user, driver):
         email = create_user.json()['user']['email']  # Создаем временного пользователя
-        ready_counter = MainPage(driver)
-        ready_counter.click_element(MainPageLocators.ORDER_LIST)
-        ready_count = ready_counter.wait_and_find_element(OrderListLocators.READY_COUNT_ALL_TIME).text
-        ready_counter.click_element(MainPageLocators.ACCOUNT_BUTTON)
-        ready_counter.filling_text_field(LoginPageLocators.EMAIL_TEXT_FIELD, email)
-        ready_counter.filling_text_field(LoginPageLocators.PASSWORD_TEXT_FIELD,
-                                         ApiData.BODY_USER_REGISTRATION['password'])
-        ready_counter.click_element(LoginPageLocators.ENTER_BUTTON)  # Авторизовываемся
+        ready_counter = OrderListPage(driver)
+        ready_counter.main_page_click_order_list()
+        ready_count = ready_counter.order_list_page_wait_and_find_counter_all_time().text
+        ready_counter.main_page_click_to_login()
+        ready_counter.login_page_fill_email(email)
+        ready_counter.login_page_fill_password(ApiData.BODY_USER_REGISTRATION['password'])
+        ready_counter.login_page_log_in()
         ready_counter.wait_close_modal_page()
-        element_from = ready_counter.wait_and_find_element(MainPageLocators.KRATERNAY_BULKA)
-        element_to = ready_counter.wait_and_find_element(MainPageLocators.TOP_BASKET_CONSTRUCTOR)
+        element_from = ready_counter.main_page_wait_and_find_kraternaya_bulka()
+        element_to = ready_counter.main_page_wait_and_find_basket()
         drag_and_drop(driver, element_from, element_to)
-        ready_counter.click_element(MainPageLocators.ORDER)  # Создаем заказ
+        ready_counter.main_page_click_order_button()
         time.sleep(3)  # Костыль - для стальной отработки
-        ready_counter.click_element(MainPageLocators.ORDER_CLOSE_BUTTON)
-        ready_counter.click_element(MainPageLocators.ORDER_LIST)
-        # Проверка на увеличение счетчика заказов за все время при создании нового заказа
-        assert int(ready_counter.wait_and_find_element(OrderListLocators.READY_COUNT_ALL_TIME).text) > int(ready_count)
+        ready_counter.main_page_click_close_order_modal()
+        ready_counter.main_page_click_order_list()
+        assert int(ready_counter.order_list_page_wait_and_find_counter_all_time().text) > int(ready_count)
 
     def test_ready_counter_today(self, create_user, driver):
         email = create_user.json()['user']['email']  # Создаем временного пользователя
-        ready_counter = MainPage(driver)
+        ready_counter = OrderListPage(driver)
         ready_counter.click_element(MainPageLocators.ORDER_LIST)
-        ready_count = ready_counter.wait_and_find_element(OrderListLocators.READY_COUNT_TODAY).text
-        ready_counter.click_element(MainPageLocators.ACCOUNT_BUTTON)
-        ready_counter.filling_text_field(LoginPageLocators.EMAIL_TEXT_FIELD, email)
-        ready_counter.filling_text_field(LoginPageLocators.PASSWORD_TEXT_FIELD,
-                                         ApiData.BODY_USER_REGISTRATION['password'])
-        ready_counter.click_element(LoginPageLocators.ENTER_BUTTON)  # Авторизовываемся
+        ready_count = ready_counter.order_list_page_wait_and_find_counter_today().text
+        ready_counter.main_page_click_to_login()
+        ready_counter.login_page_fill_email(email)
+        ready_counter.login_page_fill_password(ApiData.BODY_USER_REGISTRATION['password'])
+        ready_counter.login_page_log_in()
         ready_counter.wait_close_modal_page()
-        element_from = ready_counter.wait_and_find_element(MainPageLocators.KRATERNAY_BULKA)
-        element_to = ready_counter.wait_and_find_element(MainPageLocators.TOP_BASKET_CONSTRUCTOR)
+        element_from = ready_counter.main_page_wait_and_find_kraternaya_bulka()
+        element_to = ready_counter.main_page_wait_and_find_basket()
         drag_and_drop(driver, element_from, element_to)
-        ready_counter.click_element(MainPageLocators.ORDER)  # Создаем заказ
+        ready_counter.main_page_click_order_button()
         time.sleep(3)  # Костыль - для стальной отработки
-        ready_counter.click_element(MainPageLocators.ORDER_CLOSE_BUTTON)
-        ready_counter.click_element(MainPageLocators.ORDER_LIST)
+        ready_counter.main_page_click_close_order_modal()
+        ready_counter.main_page_click_order_list()
         # Проверка на увеличение счетчика заказов за сегодня при создании нового заказа
-        assert int(ready_counter.wait_and_find_element(OrderListLocators.READY_COUNT_TODAY).text) > int(ready_count)
+        assert int(ready_counter.order_list_page_wait_and_find_counter_today().text) > int(ready_count)
 
     def test_current_order_in_work(self, create_user, driver):
         email = create_user.json()['user']['email']  # Создаем временного пользователя
-        current_order = MainPage(driver)
-        current_order.click_element(MainPageLocators.ACCOUNT_BUTTON)
-        current_order.filling_text_field(LoginPageLocators.EMAIL_TEXT_FIELD, email)
-        current_order.filling_text_field(LoginPageLocators.PASSWORD_TEXT_FIELD,
-                                         ApiData.BODY_USER_REGISTRATION['password'])
-        current_order.click_element(LoginPageLocators.ENTER_BUTTON)  # Авторизовываемся
+        current_order = OrderListPage(driver)
+        current_order.main_page_click_to_login()
+        current_order.login_page_fill_email(email)
+        current_order.login_page_fill_password(ApiData.BODY_USER_REGISTRATION['password'])
+        current_order.login_page_log_in()
         current_order.wait_close_modal_page()
-        element_from = current_order.wait_and_find_element(MainPageLocators.KRATERNAY_BULKA)
-        element_to = current_order.wait_and_find_element(MainPageLocators.TOP_BASKET_CONSTRUCTOR)
+        element_from = current_order.main_page_wait_and_find_kraternaya_bulka()
+        element_to = current_order.main_page_wait_and_find_basket()
         drag_and_drop(driver, element_from, element_to)  # Создаем заказ
-        current_order.click_element(MainPageLocators.ORDER)
+        current_order.main_page_click_order_button()
         time.sleep(3)  # Костыль - для стальной отработки
-        number = current_order.wait_and_find_element(MainPageLocators.ORDER_NUMBER).text
-        current_order.click_element(MainPageLocators.ORDER_CLOSE_BUTTON)
-        current_order.click_element(MainPageLocators.ORDER_LIST)
+        number = current_order.main_page_wait_and_find_order_number().text
+        current_order.main_page_click_close_order_modal()
+        current_order.main_page_click_order_list()
         locator = (By.XPATH, f'//ul[contains(@class,"orderListReady")]/li[text()="{number}"]')
         number_in_work = current_order.wait_and_find_element(locator).text
-        assert number in number_in_work  # Проверка, что созданный заказ в работе
+        assert number in number_in_work  #

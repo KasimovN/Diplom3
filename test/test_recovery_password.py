@@ -1,35 +1,30 @@
 from data import StarBurgerData
-from locators.login_page_locators import LoginPageLocators
-from locators.main_page_locators import MainPageLocators
-from locators.recovery_page_locators import RecoveryPageLocators
 from pages.recovery_page import RecoveryPage
 
 
 class TestRecoveryPassword:
     def test_load_recovery_page(self, driver):
         recovery_page = RecoveryPage(driver)
-        recovery_page.click_element(MainPageLocators.ACCOUNT_BUTTON)  # Переход на форму авторизации
-        recovery_page.click_element(LoginPageLocators.RECOVERY_PASSWORD_BUTTON)
-        assert driver.current_url == StarBurgerData.FORGOT_PASSWORD_URL  # Проверяем, верный URL
+        recovery_page.main_page_click_to_login()
+        recovery_page.login_page_click_recovery_button()
+        assert driver.current_url == StarBurgerData.FORGOT_PASSWORD_URL
 
     def test_click_recovery_button(self, create_user, driver):
-        email = create_user.json()['user']['email']  # Создаем временного пользователя
+        email = create_user.json()['user']['email']
         recovery_button = RecoveryPage(driver)
-        recovery_button.click_element(MainPageLocators.ACCOUNT_BUTTON)
-        recovery_button.click_element(LoginPageLocators.RECOVERY_PASSWORD_BUTTON)
-        # Заполняем email и восстановливаем пароль
-        recovery_button.filling_text_field(RecoveryPageLocators.EMAIL_TEXT_FIELD, email)
-        recovery_button.click_element(RecoveryPageLocators.RECOVERY_BUTTON)
-        assert recovery_button.wait_and_find_element(RecoveryPageLocators.RECOVERY_BUTTON)
+        recovery_button.main_page_click_to_login()
+        recovery_button.login_page_click_recovery_button()
+        recovery_button.recovery_page_fill_email(email)
+        recovery_button.recovery_page_click_recovery_button()
+        assert recovery_button.recovery_page_password_text_field()
 
     def test_visible_password_field(self, create_user, driver):
-        email = create_user.json()['user']['email']  # Создаем временного пользователя
+        email = create_user.json()['user']['email']
         recovery_visible_button = RecoveryPage(driver)
-        recovery_visible_button.click_element(MainPageLocators.ACCOUNT_BUTTON)
-        recovery_visible_button.click_element(LoginPageLocators.RECOVERY_PASSWORD_BUTTON)
-        recovery_visible_button.filling_text_field(RecoveryPageLocators.EMAIL_TEXT_FIELD, email)
-        recovery_visible_button.click_element(RecoveryPageLocators.RECOVERY_BUTTON)
-        # Клик на кнопку показать/скрыть пароль делаем видимым пароль
-        recovery_visible_button.wait_and_find_element(RecoveryPageLocators.VISIBLE_PASSWORD_BUTTON).click()
-        password_field = recovery_visible_button.wait_and_find_element(RecoveryPageLocators.PASSWORD_TEXT_FIELD)
-        assert password_field.get_attribute('type') == 'text'
+        recovery_visible_button.main_page_click_to_login()
+        recovery_visible_button.login_page_click_recovery_button()
+        recovery_visible_button.recovery_page_fill_email(email)
+        recovery_visible_button.recovery_page_click_recovery_button()
+        recovery_visible_button.recovery_page_click_visible_password()
+        password_field = recovery_visible_button.recovery_page_password_text_field().get_attribute('type')
+        assert password_field == 'text'
